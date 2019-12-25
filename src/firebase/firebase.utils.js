@@ -16,9 +16,10 @@ firebase.initializeApp(config);
 
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
-  const userRef = firestore.doc(`users/${userAuth.uid}`);
-  const snapShot = await userRef.get();
 
+  const userRef = firestore.doc(`users/${userAuth.uid}`); // firebse automatically generates uid for new user -> always able to get ref
+  const snapShot = await userRef.get(); // get snapshot of existing user in firestore
+  // add new user info to firestore
   if (!snapShot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
