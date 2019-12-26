@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 
 import "./App.css";
@@ -22,8 +22,6 @@ class App extends React.Component {
         const userRef = await createUserProfileDocument(userAuth);
 
         userRef.onSnapshot(snapShot => {
-          // onSnapShot gets triggered twice: null to Promise, Promise to resolved res?
-          console.log(snapShot);
           setCurrentUser({
             id: snapShot.id,
             ...snapShot.data()
@@ -31,11 +29,10 @@ class App extends React.Component {
         });
       }
 
-      setCurrentUser(userAuth); // reset to null after signing out
+      setCurrentUser(userAuth);
     });
   }
 
-  // cancel event listener "onAuthStateChanged" to prevent memory leak
   componentWillUnmount() {
     this.unsubscribeFromAuth();
   }
@@ -47,15 +44,29 @@ class App extends React.Component {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path="/shop" component={ShopPage} />
-          <Route path="/signin" component={SignInAndSignUpPage} />
+          <Route
+            exact
+            path="/signin"
+            render={() =>
+              this.props.currentUser ? (
+                <Redirect to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+          />
         </Switch>
       </div>
     );
   }
 }
 
+const mapStateToProps = ({ user }) => ({
+  currentUser: user.currentUser
+});
+
 const mapDispatchToProps = dispatch => ({
   setCurrentUser: user => dispatch(setCurrentUser(user))
 });
 
-export default connect(null, mapDispatchToProps)(App);
+export default connect(mapStateToProps, mapDispatchToProps)(App);
