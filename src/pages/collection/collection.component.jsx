@@ -21,8 +21,12 @@ const CollectionPage = ({ collection }) => {
   );
 };
 
+/* 
+** State is automatically passed in when using createStructuredSelector.
+** Since the function here already takes a param, have to pass state as a 2nd param.
+*/
 const mapStateToProps = (state, ownProps) => ({
-  collection: selectCollection(ownProps.match.params.collectionId)(state)
+  collection: selectCollection(ownProps.match.params.collectionId)(state) 
 });
 
 export default connect(mapStateToProps)(CollectionPage);
