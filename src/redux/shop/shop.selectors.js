@@ -7,6 +7,7 @@ export const selectCollections = createSelector(
   shop => shop.collections
 );
 
+// get array from collections object for preview component filter functionality
 export const selectCollectionsForPreview = createSelector(
   [selectCollections],
   collections => Object.keys(collections).map(key => collections[key])
