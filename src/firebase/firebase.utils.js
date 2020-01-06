@@ -21,7 +21,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   const snapShot = await userRef.get(); // get snapshot of existing user in firestore through ref
   // add new user info to firestore
   if (!snapShot.exists) {
-    const { displayName, email } = userAuth;
+    const { displayName, email } = userAuth; // displayName: built-in field of google sign in
     const createdAt = new Date();
     try {
       await userRef.set({
@@ -67,16 +67,25 @@ export const convertCollectionsSnapshotToMap = collections => {
 
   return transformedCollection.reduce((accumulator, collection) => {
     accumulator[collection.title.toLowerCase()] = collection;
-    console.log(transformedCollection,accumulator);
+    console.log(transformedCollection, accumulator);
     return accumulator;
   }, {});
+};
+
+export const getCurrentUser = () => {
+  return new Promise((resolve, reject) => {
+    const unsubscribe = auth.onAuthStateChanged(userAuth => {
+      unsubscribe(); // clean up listener
+      resolve(userAuth);
+    }, reject);
+  });
 };
 
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
-const provider = new firebase.auth.GoogleAuthProvider();
-provider.setCustomParameters({ prompt: "select_account" });
-export const signInWithGoogle = () => auth.signInWithPopup(provider);
+export const googleProvider = new firebase.auth.GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
+export const signInWithGoogle = () => auth.signInWithPopup(googleProvider);
 
 export default firebase;
